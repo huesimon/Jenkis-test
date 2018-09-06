@@ -1,7 +1,9 @@
-env:
-  global:
-  - 'FTP_USERNAME=[user]'
-  - 'FTP_PASSWORD=[password]'
+language: php
+php:
+  - '5.6'
+  - '7.1'
+  - hhvm # on Trusty only
+  - nightly
 after_success:
 - echo 'AFTER SUCCESS'
 - curl --user ${FTP_USERNAME}:${FTP_PASSWORD}ftp://hammernemt.dk
