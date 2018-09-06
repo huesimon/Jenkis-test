@@ -1,28 +1,44 @@
 #!/bin/bash
-gitLastCommit=$(git show --summary --grep="Merge pull request")
-if [[ -z "$gitLastCommit" ]]
-then
-	lastCommit=$(git log --format="%H" -n 1)
-else
-	echo "We got a Merge Request!"
-	#take the last commit and take break every word into an array
-	arr=($gitLastCommit)
-	#the 5th element in the array is the commit ID we need. If git log changes, this breaks. :(
-	lastCommit=${arr[4]}
-fi
-echo $lastCommit
 
-filesChanged=$(git diff-tree --no-commit-id --name-only -r $lastCommit)
-if [ ${#filesChanged[@]} -eq 0 ]; then
-    echo "No files to update"
+# print outputs and exit on first failure
+set -xe
+
+if [ $TRAVIS_BRANCH == "master" ] ; then
+
+    # setup ssh agent, git config and remote
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/travis_rsa
+    git remote add deploy "travis@webhost.planecq.xyz:/var/www/planecq.com"
+    git config user.name "Travis CI"
+    git config user.email "travis@planecq.com"
+
+    # commit compressed files and push it to remote
+    rm -f .gitignore
+    cp .travis/deployignore .gitignore
+    git add .
+    git status # debug
+    git commit -m "Deploy compressed files"
+    git push -f deploy HEAD:master
+
+elif [ $TRAVIS_BRANCH == "staging" ] ; then
+
+    # setup ssh agent, git config and remote
+    eval "$(ssh-agent -s)"
+    ssh-add ~/.ssh/travis_rsa
+    git remote add deploy "travis@webhost.planecq.xyz:/var/www/planecq.xyz"
+    git config user.name "Travis CI"
+    git config user.email "travis@planecq.com"
+
+    # commit compressed files and push it to remote
+    rm -f .gitignore
+    cp .travis/deployignore .gitignore
+    git add .
+    git status # debug
+    git commit -m "Deploy compressed files"
+    git push -f deploy HEAD:master
+
 else
-    for f in $filesChanged
-	do
-		#do not upload these files that aren't necessary to the site
-		if [ "$f" != ".travis.yml" ] && [ "$f" != "deploy.sh" ] && [ "$f" != "test.js" ] && [ "$f" != "package.json" ]
-		then
-	 		echo "Uploading $f"
-	 		curl --ftp-create-dirs -T $f -u $FTP_USERNAME:$FTP_PASSWORD ftp://hammernemt.dk/$f
-		fi
-	done
+
+    echo "No deploy script for branch '$TRAVIS_BRANCH'"
+
 fi
