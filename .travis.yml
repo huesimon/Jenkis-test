@@ -1,9 +1,5 @@
 branches:
   only:
     - master
-env:
-  global:
-    - "FTP_USERNAME=user"
-    - "FTP_PASSWORD=password"
 after_success:
   - ./deploy.sh 
