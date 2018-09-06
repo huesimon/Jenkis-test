@@ -1,4 +1,7 @@
 language: generic
 after_success:
-- echo 'AFTER SUCCESS'
-- curl --user ${FTP_USERNAME}:${FTP_PASSWORD}ftp://hammernemt.dk
+- echo "${SFTP_KEY}" | base64 --decode >/tmp/sftp_rsa
+- curl --ftp-create-dirs
+       -T filename
+       --key /tmp/sftp_rsa
+       sftp://${FTP_USERNAME}:${FTP_PASSWORD}@hammernemt.dk/
