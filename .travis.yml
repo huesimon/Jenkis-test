@@ -3,4 +3,4 @@ after_success:
 - echo "${SFTP_KEY}" | base64 --decode >/tmp/sftp_rsa
 - curl --ftp-create-dirs
        -T index.html
-       sftp://${FTP_USERNAME}:${FTP_PASSWORD}@hammernemt.dk/
+       ftp://${FTP_USERNAME}:${FTP_PASSWORD}@hammernemt.dk/
