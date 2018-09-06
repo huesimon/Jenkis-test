@@ -1,9 +1,9 @@
+branches:
+  only:
+    - master
 env:
   global:
-  - 'FTP_USERNAME=[user]'
-  - 'FTP_PASSWORD=[password]'
+    - "FTP_USERNAME=user"
+    - "FTP_PASSWORD=password"
 after_success:
-- curl --ftp-create-dirs
-       -T filename
-       --key /tmp/sftp_rsa
-       ftp://${FTP_USERNAME}:${FTP_PASSWORD}@hammernemt.dk
+  - ./deploy.sh 
